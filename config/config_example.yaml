@@ -1,0 +1,373 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: API Catalog
+host: YOUR_HOST
+basePath: /api
+#
+schemes:
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+
+securityDefinitions:
+  appCredentials:
+    type: apiKey
+    in: header
+    name: X-APP-KEY
+    #name: X-APP-SECRET
+security:
+  - appCredentials: []
+
+paths:
+  /ping:
+    x-swagger-router-controller: ping
+    get:
+      description: Ping
+      operationId: ping
+      security: []
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/SuccessResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /catalog/create:
+    post:
+      x-swagger-router-controller: catalog
+      description: Creating new catalog item
+      summary:  Creating new catalog item
+      operationId: create
+      parameters:
+        - in: body
+          name: catalog
+          required: true
+          schema:
+            $ref: "#/definitions/CatalogApi"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/Catalog"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /catalog/link:
+    post:
+      x-swagger-router-controller: catalog
+      description: Linking catalog to some other catalog by pid (parent catalog id)
+      operationId: link
+      parameters:
+        - in: body
+          name: data
+          required: true
+          schema:
+            $ref: "#/definitions/CatalogLink"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/CatalogPid"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /catalog/list/random/{storage}:
+    parameters:
+    - name: storage
+      in: path
+      required: true
+      type: string
+    post:
+      x-swagger-router-controller: catalog
+      description: Get random catalog items by pids AND/OR keys
+      operationId: random
+      parameters:
+        - in: body
+          name: data
+          required: false
+          schema:
+            $ref: "#/definitions/CatalogRandom"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/Catalogs"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /catalog/list/order/{storage}:
+    parameters:
+    - name: storage
+      in: path
+      required: true
+      type: string
+    post:
+      x-swagger-router-controller: catalog
+      description: Get ordered catalog ids by keys
+      operationId: list
+      parameters:
+        - in: body
+          name: data
+          required: true
+          schema:
+            $ref: "#/definitions/CatalogList"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/CatalogIds"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /catalog/{storage}/{id}:
+    x-swagger-router-controller: catalog
+    parameters:
+      - name: storage
+        in: path
+        required: true
+        type: string
+      - name: id
+        in: path
+        required: true
+        type: integer
+    get:
+      x-swagger-router-controller: catalog
+      description: Getting catalog item
+      operationId: get
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Catalog"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      x-swagger-router-controller: catalog
+      description: Updating catalog item
+      summary:  Updating catalog item
+      operationId: update
+      parameters:
+        - in: body
+          name: data
+          required: true
+          schema:
+            $ref: "#/definitions/CatalogApi"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/Catalog"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+    delete:
+      x-swagger-router-controller: catalog
+      description: Removing catalog pid item
+      operationId: remove
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /catalog/{storage}/{key}/{content}:
+      parameters:
+      - name: storage
+        in: path
+        required: true
+        type: string
+      - name: key
+        in: path
+        required: true
+        type: string
+      - name: content
+        in: path
+        required: true
+        type: string
+      get:
+        x-swagger-router-controller: catalog
+        description: Getting catalog from {storage} by {key} and {content}
+        operationId: getByKeyContent
+        responses:
+          "200":
+            description: Success
+            schema:
+              $ref: "#/definitions/Catalog"
+          default:
+            description: Error
+            schema:
+              $ref: "#/definitions/ErrorResponse"
+
+  /swagger:
+    x-swagger-pipe: swagger_raw
+
+definitions:
+
+  SuccessResponse:
+    required:
+      - ok
+    properties:
+      ok:
+        type: boolean
+
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+
+  CatalogApi:
+      type: object
+      properties:
+        storage:
+          type: string
+        pid:
+          type: integer
+        key:
+          type: string
+        content:
+          type: string
+        data:
+          type: object
+
+  CatalogLink:
+      type: object
+      properties:
+        id:
+          type: integer
+        pid:
+          type: integer
+        storage:
+          type: string
+
+  CatalogRandom:
+    type: object
+    properties:
+      pids:
+        type: array
+        items:
+          type: integer
+      keys:
+        type: array
+        items:
+          type: string
+      limit:
+        type: integer
+        default: 1
+
+  CatalogList:
+    type: object
+    properties:
+      keys:
+        type: array
+        items:
+          type: string
+      limit:
+        type: integer
+        default: 10
+      order:
+        type: object
+        properties:
+          column:
+            type: string
+            enum:
+              - id
+              - key_id
+              - content
+              - created
+              - updated
+          position:
+            type: string
+            enum:
+              - asc
+              - desc
+
+  CatalogKey:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+        example: Some name
+
+  Catalog:
+    type: object
+    properties:
+      id:
+        type: integer
+      storage:
+        type: string
+      key:
+        $ref: '#/definitions/CatalogKey'
+      content:
+        type: string
+        example: Some text message
+      objType:
+        type: string
+        example: Some text message
+      created:
+        type: string
+        example: Date and time in js format
+      data:
+        type: string
+        example: Some text message
+
+  Catalogs:
+    type: object
+    properties:
+      catalogs:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/Catalog'
+
+  CatalogPid:
+    type: object
+    properties:
+      id:
+        type: integer
+      pid:
+        type: integer
+      storage:
+        type: string
+      catalog:
+        $ref: '#/definitions/Catalog'
+
+  CatalogIds:
+    type: array
+    items:
+      type: integer

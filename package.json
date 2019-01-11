@@ -1,0 +1,32 @@
+{
+  "name": "catalog",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Catalog Microservice",
+  "keywords": [],
+  "author": "",
+  "license": "",
+  "main": "app.js",
+  "dependencies": {
+    "config": "^1.28.1",
+    "express": "^4.12.3",
+    "express-graphql": "^0.6.11",
+    "graphql": "^0.12.3",
+    "graphql-tools": "^2.20.2",
+    "md5": "^2.2.1",
+    "pubnub": "4.17.0",
+    "swagger-express-mw": "^0.1.0",
+    "swagger-test-templates": "^1.4.3",
+    "util": "^0.10.3",
+    "wap3-app-session": "git+https://github.com/nvvetal/raks-app-session.git#v1.0.1",
+    "wap3-lib": "git+https://github.com/nvvetal/raks-sql.git#v1.0.7"
+  },
+  "devDependencies": {
+    "should": "^7.1.0",
+    "supertest": "^1.0.0"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "test": "swagger project test"
+  }
+}

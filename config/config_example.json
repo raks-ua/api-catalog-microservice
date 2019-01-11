@@ -1,0 +1,26 @@
+{
+    "DB": {
+        "HOST": "",
+        "NAME": "",
+        "USER": "",
+        "PASSWORD": ""
+    },
+    "port": 100XX,
+    "API_SESSION": {
+        "URL": "",
+        "TIMEOUT": 2000
+    },
+    "API_APP": {
+        "KEY": "",
+        "SECRET": "",
+        "URL": "",
+        "TIMEOUT": 2000,
+        "PUBNUB": {
+            "PUBLISH_KEY": "",
+            "SUBSCRIBE_KEY": ""
+        }
+    },
+    "APP_TEST_URL": "",
+    "APP_TEST_KEY": "",
+    "APP_TEST_SECRET": ""
+}
